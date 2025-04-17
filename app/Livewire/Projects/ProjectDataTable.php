@@ -114,6 +114,19 @@ class ProjectDataTable extends DataTableComponent
                         $builder->where('failure', 0);
                     }
                 }),
+            SelectFilter::make('Second Click')
+                ->options([
+                    '' => 'All',
+                    '1' => 'Yes',
+                    '0' => 'No',
+                ])
+                ->filter(function(Builder $builder, string $value) {
+                    if ($value === '1') {
+                        $builder->where('second_click', 1);
+                    } elseif ($value === '0') {
+                        $builder->where('second_click', 0);
+                    }
+                }),
             DateRangeFilter::make('Date Range')
                 ->config([
                     'allowInput' => true,   // Allow manual input of dates
