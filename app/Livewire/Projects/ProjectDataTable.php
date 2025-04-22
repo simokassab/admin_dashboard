@@ -68,7 +68,7 @@ class ProjectDataTable extends DataTableComponent
                 ->sortable()->searchable(),
             Column::make('msisdn')
                 ->sortable()->searchable(),
-            Column::make('user_ip')
+            Column::make('source')
                 ->sortable()->searchable(),
             BooleanColumn::make('success'),
             BooleanColumn::make('failure')
@@ -125,6 +125,19 @@ class ProjectDataTable extends DataTableComponent
                         $builder->where('second_click', 1);
                     } elseif ($value === '0') {
                         $builder->where('second_click', 0);
+                    }
+                }),
+            SelectFilter::make('Source')
+                ->options([
+                    '' => 'All',
+                    'PIN' => 'PIN',
+                    'HE' => 'HE',
+                ])
+                ->filter(function(Builder $builder, string $value) {
+                    if ($value === 'PIN') {
+                        $builder->where('source', "PIN");
+                    } elseif ($value === 'HE') {
+                        $builder->where('source', "HE");
                     }
                 }),
             DateRangeFilter::make('Date Range')
