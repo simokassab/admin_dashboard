@@ -20,9 +20,27 @@ class ProjectDataTable extends DataTableComponent
 {
     public $count = 0;
     public $project_id;
+    protected $timezone = 'Asia/Baghdad'; // GMT+3 timezone
 
     public function mount($project_id){
         $this->project_id = $project_id;
+    }
+
+    /**
+     * Convert a date between timezones
+     *
+     * @param string $date The date to convert
+     * @param string $fromTimezone The source timezone
+     * @param string $toTimezone The target timezone
+     * @param string $format The output format
+     * @return string
+     */
+    protected function convertTimezone($date, $fromTimezone = 'UTC', $toTimezone = null, $format = 'Y-m-d H:i:s')
+    {
+        $toTimezone = $toTimezone ?? $this->timezone;
+        return Carbon::parse($date, $fromTimezone)
+            ->setTimezone($toTimezone)
+            ->format($format);
     }
 
     public function builder(): Builder
@@ -78,8 +96,10 @@ class ProjectDataTable extends DataTableComponent
             BooleanColumn::make('first_click'),
             BooleanColumn::make('second_click'),
             // Custom column for created_at with GMT+3 timezone
-            DateColumn::make('Created At', 'created_at')
-                ->outputFormat('Y-m-d')
+            Column::make('Created At', 'created_at')
+                ->format(function($value, $row, Column $column) {
+                    return $this->convertTimezone($value);
+                })
                 ->sortable(),
             LinkColumn::make('Details')
                 ->title(fn ($row) => $row->integrationLogs()->exists() ? 'Logs' : '')
@@ -145,7 +165,7 @@ class ProjectDataTable extends DataTableComponent
                 }),
             DateRangeFilter::make('Date Range')
                 ->config([
-                    'allowInput' => false,   // Allow manual input of dates
+                    'allowInput' => true,   // Allow manual input of dates
                     'altFormat' => 'F j, Y', // Date format that will be displayed once selected
                     'ariaDateFormat' => 'F j, Y', // An aria-friendly date format
                     'dateFormat' => 'Y-m-d', // Date format that will be received by the filter
@@ -156,12 +176,14 @@ class ProjectDataTable extends DataTableComponent
                 ->filter(function(Builder $builder, array $value) {
                     if ($value['minDate'] ?? false) {
                         // Convert from GMT+3 to GMT for database query
-                        $builder->whereDate('created_at', '>=', $value['minDate']);
+                        $minDate = $this->convertTimezone($value['minDate'], $this->timezone, 'UTC', 'Y-m-d');
+                        $builder->whereDate('created_at', '>=', $minDate);
                     }
 
                     if ($value['maxDate'] ?? false) {
                         // Convert from GMT+3 to GMT for database query
-                        $builder->whereDate('created_at', '<=', $value['maxDate']);
+                        $maxDate = $this->convertTimezone($value['maxDate'], $this->timezone, 'UTC', 'Y-m-d');
+                        $builder->whereDate('created_at', '<=', $maxDate);
                     }
                 }),
 
