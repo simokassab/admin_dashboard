@@ -80,10 +80,8 @@ class ProjectDataTable extends DataTableComponent
             BooleanColumn::make('first_click'),
             BooleanColumn::make('second_click'),
             // Custom column for created_at with GMT+3 timezone
-            Column::make('Created At', 'created_at')
-                ->format(function($value, $row, Column $column) {
-                    return $this->convertTimezone($value);
-                })
+            DateColumn::make('Created At', 'created_at')
+                ->outputFormat('Y-m-d')
                 ->sortable(),
             LinkColumn::make('Details')
                 ->title(fn ($row) => $row->integrationLogs()->exists() ? 'Logs' : '')
