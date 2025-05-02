@@ -25,8 +25,6 @@ class ProjectDataTable extends DataTableComponent
         $this->project_id = $project_id;
     }
 
-
-
     public function builder(): Builder
     {
         return Tracking::query()->with('integrationLogs')->where('project_source_id', $this->project_id)
@@ -147,7 +145,7 @@ class ProjectDataTable extends DataTableComponent
                 }),
             DateRangeFilter::make('Date Range')
                 ->config([
-                    'allowInput' => false,   // Allow manual input of dates
+                    'allowInput' => true,   // Allow manual input of dates
                     'altFormat' => 'F j, Y', // Date format that will be displayed once selected
                     'ariaDateFormat' => 'F j, Y', // An aria-friendly date format
                     'dateFormat' => 'Y-m-d', // Date format that will be received by the filter
@@ -157,13 +155,10 @@ class ProjectDataTable extends DataTableComponent
                 ])
                 ->filter(function(Builder $builder, array $value) {
                     if ($value['minDate'] ?? false) {
-                        // Convert from GMT+3 to GMT for database query
-
                         $builder->whereDate('created_at', '>=', $value['minDate']);
                     }
 
                     if ($value['maxDate'] ?? false) {
-                        // Convert from GMT+3 to GMT for database query
                         $builder->whereDate('created_at', '<=', $value['maxDate']);
                     }
                 }),
