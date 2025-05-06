@@ -96,10 +96,8 @@ class ProjectDataTable extends DataTableComponent
             BooleanColumn::make('first_click'),
             BooleanColumn::make('second_click'),
             // Custom column for created_at with GMT+3 timezone
-            Column::make('Created At', 'created_at')
-                ->format(function($value, $row, Column $column) {
-                    return $this->convertTimezone($value);
-                })
+            DateColumn::make('Created At', 'created_at')
+                ->outputFormat('Y-m-d H:i:s')
                 ->sortable(),
             LinkColumn::make('Details')
                 ->title(fn ($row) => $row->integrationLogs()->exists() ? 'Logs' : '')
@@ -176,15 +174,20 @@ class ProjectDataTable extends DataTableComponent
                 ->filter(function(Builder $builder, array $value) {
                     if ($value['minDate'] ?? false) {
                         // Convert from GMT+3 to GMT for database query
-                        $minDate = $this->convertTimezone($value['minDate'], $this->timezone, 'UTC', 'Y-m-d');
-                        $builder->whereDate('created_at', '>=', $minDate);
+                        $builder->whereDate('created_at', '>=', $value['minDate']);
                     }
 
                     if ($value['maxDate'] ?? false) {
                         // Convert from GMT+3 to GMT for database query
                         $maxDate = $this->convertTimezone($value['maxDate'], $this->timezone, 'UTC', 'Y-m-d');
-                        $builder->whereDate('created_at', '<=', $maxDate);
+                        $builder->whereDate('created_at', '<=', $value['maxDate']);
                     }
+
+                    $query = $builder->toSql();
+                    $bindings = $builder->getBindings();
+
+                    dump('SQL Query:', $query);
+                    dump('Bindings:', $bindings);
                 }),
 
         ];
