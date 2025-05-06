@@ -183,11 +183,11 @@ class ProjectDataTable extends DataTableComponent
                         $builder->whereDate('created_at', '<=', $value['maxDate']);
                     }
 
-                    $query = $builder->toSql();
-                    $bindings = $builder->getBindings();
-
-                    dump('SQL Query:', $query);
-                    dump('Bindings:', $bindings);
+//                    $query = $builder->toSql();
+//                    $bindings = $builder->getBindings();
+//
+//                    dump('SQL Query:', $query);
+//                    dump('Bindings:', $bindings);
                 }),
 
         ];
