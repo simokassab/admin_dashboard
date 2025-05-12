@@ -163,7 +163,7 @@ class ProjectDataTable extends DataTableComponent
                 }),
             DateRangeFilter::make('Date Range')
                 ->config([
-                    'allowInput' => true,   // Allow manual input of dates
+                    'allowInput' => false,   // Allow manual input of dates
                     'altFormat' => 'F j, Y', // Date format that will be displayed once selected
                     'ariaDateFormat' => 'F j, Y', // An aria-friendly date format
                     'dateFormat' => 'Y-m-d', // Date format that will be received by the filter
